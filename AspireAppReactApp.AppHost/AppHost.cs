@@ -71,4 +71,10 @@ builder.AddProject<Projects.AspireAppReactApp_Web>("webfrontend")
 
 
 
+builder.AddProject<Projects.MvcWebApp>("mvcwebapp")
+    .WithReference(apiService)
+    .WaitFor(apiService);
+
+
+
 builder.Build().Run();

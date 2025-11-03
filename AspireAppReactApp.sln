@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.36408.4
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11010.61 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspireAppReactApp.AppHost", "AspireAppReactApp.AppHost\AspireAppReactApp.AppHost.csproj", "{16F4CFB2-8C8C-4FCF-9E60-F35F5138BC38}"
 EndProject
@@ -13,6 +13,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FunctionApp", "FunctionApp\FunctionApp.csproj", "{F395AC0F-06F0-3117-D0B5-3D72F3C1B925}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedClassLibrary", "SharedClassLibrary\SharedClassLibrary.csproj", "{CAC40B20-0FE1-4710-91D4-87DFD6858589}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvcWebApp", "MvcWebApp\MvcWebApp.csproj", "{98DCCA61-3848-967E-E422-1DEDB4CB8569}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,6 +46,10 @@ Global
 		{CAC40B20-0FE1-4710-91D4-87DFD6858589}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CAC40B20-0FE1-4710-91D4-87DFD6858589}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CAC40B20-0FE1-4710-91D4-87DFD6858589}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98DCCA61-3848-967E-E422-1DEDB4CB8569}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98DCCA61-3848-967E-E422-1DEDB4CB8569}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98DCCA61-3848-967E-E422-1DEDB4CB8569}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98DCCA61-3848-967E-E422-1DEDB4CB8569}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

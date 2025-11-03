@@ -1,0 +1,276 @@
+﻿@model List<MvcWebApp.Models.TodoDto>
+@{
+    ViewData["Title"] = "Todo List";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/modern-normalize/1.1.0/modern-normalize.min.css" />
+
+<style>
+    .container {
+        max-width: 900px;
+        margin: 2rem auto;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+
+    .card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 6px 30px rgba(2,6,23,0.08);
+        padding: 1.5rem;
+    }
+
+    .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem
+    }
+
+    .h1 {
+        font-size: 1.6rem;
+        font-weight: 700;
+    }
+
+    .input-row {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem
+    }
+
+    .input {
+        flex: 1;
+        padding: 0.6rem 0.9rem;
+        border-radius: 8px;
+        border: 1px solid #e6edf3
+    }
+
+    .add-btn {
+        background: linear-gradient(90deg,#2563eb,#4f46e5);
+        color: #fff;
+        border: none;
+        padding: 0.6rem 1rem;
+        border-radius: 8px;
+        cursor: pointer
+    }
+
+    .list {
+        margin-top: 1rem;
+    }
+
+    .item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem;
+        border-bottom: 1px solid #f0f4f8
+    }
+
+        .item .title {
+            flex: 1;
+        }
+
+    .btn {
+        background: #f3f4f6;
+        border: none;
+        padding: 0.45rem 0.6rem;
+        border-radius: 6px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center
+    }
+
+        .btn.danger {
+            background: #fee2e2
+        }
+
+    .completed {
+        text-decoration: line-through;
+        color: #94a3b8
+    }
+
+    .actions {
+        display: flex;
+        gap: 0.5rem
+    }
+
+    .svg-icon {
+        width: 16px;
+        height: 16px;
+        display: block
+    }
+
+</style>
+
+<div class="container">
+    <div class="card">
+        <div class="header">
+            <div class="h1">Todo List</div>
+            <div class="subtitle">Manage tasks — re-order, complete, delete</div>
+        </div>
+
+        <div id="todo-root">
+            <div>
+                <div class="input-row">
+                    <input id="newTitle" class="input" placeholder="Add a new task" />
+                    <button id="addBtn" class="add-btn">Add</button>
+                </div>
+
+                <div class="list" id="todo-list">
+                    @foreach (var t in Model.OrderBy(m => m.Position))
+                    {
+                        <div class="item" data-id="@t.Id" data-position="@t.Position">
+                            <input type="checkbox" class="chk" @(t.IsComplete ? "checked" : "") />
+                            <div class="title @(t.IsComplete ? "completed" : "")">@t.Title</div>
+                            <div class="actions">
+                                <button class="btn move-up" title="Move up">
+                                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 8l-6 6h12l-6-6z" fill="#374151" /></svg>
+                                </button>
+                                <button class="btn move-down" title="Move down">
+                                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 16l6-6H6l6 6z" fill="#374151" /></svg>
+                                </button>
+                                <button class="btn danger delete" title="Delete">
+                                    <svg class="svg-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 3v1H4v2h16V4h-5V3H9zm1 6v7h2V9H10zm4 0v7h2V9h-2zM6 6h12v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6z" fill="#b91c1c" /></svg>
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function(){
+            const root = document.getElementById('todo-root');
+            const listEl = document.getElementById('todo-list');
+            const addBtn = document.getElementById('addBtn');
+            const newTitle = document.getElementById('newTitle');
+
+            async function postJson(url, data){
+                const res = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data)});
+                if(!res.ok) return null;
+                try{ return await res.json(); } catch(e){ return {}; }
+            }
+
+            addBtn.addEventListener('click', async (e)=>{
+                e.preventDefault();
+                const title = newTitle.value.trim();
+                if(!title) return;
+                // compute next position from last item's data-position
+                const last = listEl.lastElementChild;
+                const nextPosition = last ? (parseInt(last.getAttribute('data-position') || '0') + 1) : 1;
+                const created = await postJson('/Todo/Add', { title: title, position: nextPosition });
+                if(created){
+                    appendItem(created);
+                    newTitle.value='';
+                }
+            });
+
+            function appendItem(todo){
+                const div = document.createElement('div');
+                div.className='item';
+                // API returns camelCase JSON (id/title/position/isComplete)
+                const id = todo.id ?? todo.Id;
+                const title = todo.title ?? todo.Title ?? '';
+                const isComplete = todo.isComplete ?? todo.IsComplete ?? false;
+                const position = (todo.position ?? todo.Position) ?? 0;
+                div.setAttribute('data-id', id);
+                div.setAttribute('data-position', position);
+                div.innerHTML = `
+                    <input type="checkbox" class="chk" ${isComplete? 'checked':''} />
+                    <div class="title ${isComplete? 'completed':''}">${escapeHtml(title)}</div>
+                    <div class="actions">
+                        <button class="btn move-up" title="Move up"> <svg class="svg-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 8l-6 6h12l-6-6z" fill="#374151"/></svg></button>
+                        <button class="btn move-down" title="Move down"> <svg class="svg-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 16l6-6H6l6 6z" fill="#374151"/></svg></button>
+                        <button class="btn danger delete" title="Delete"> <svg class="svg-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 3v1H4v2h16V4h-5V3H9zm1 6v7h2V9H10zm4 0v7h2V9h-2zM6 6h12v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6z" fill="#b91c1c"/></svg></button>
+                    </div>`;
+                bindItem(div);
+                listEl.appendChild(div);
+            }
+
+            function escapeHtml(unsafe) {
+                return unsafe
+                     .replace(/&/g, "&amp;")
+                     .replace(/</g, "&lt;")
+                     .replace(/>/g, "&gt;")
+                     .replace(/\"/g, "&quot;")
+                     .replace(/'/g, "&#039;");
+            }
+
+            function swapElements(el1, el2){
+                const parent = el1.parentNode;
+                const next = el2.nextSibling;
+                parent.insertBefore(el2, el1);
+                if(next) parent.insertBefore(el1, next);
+                else parent.appendChild(el1);
+            }
+
+            function bindItem(el){
+                const del = el.querySelector('.delete');
+                const up = el.querySelector('.move-up');
+                const down = el.querySelector('.move-down');
+                const chk = el.querySelector('.chk');
+                const titleEl = el.querySelector('.title');
+
+                del && del.addEventListener('click', async ()=>{
+                    const id = el.getAttribute('data-id');
+                    const res = await fetch('/Todo/Delete?id='+encodeURIComponent(id), {method:'POST'});
+                    if(res.ok) el.remove();
+                });
+
+                up && up.addEventListener('click', async ()=>{
+                    const id = el.getAttribute('data-id');
+                    const prev = el.previousElementSibling;
+                    if(!prev) return; // already at top
+                    const res = await fetch('/Todo/MoveUp?id='+encodeURIComponent(id), {method:'POST'});
+                    if(res.ok){
+                        // swap DOM positions and swap data-position attributes
+                        const aPos = el.getAttribute('data-position');
+                        const bPos = prev.getAttribute('data-position');
+                        swapElements(prev, el);
+                        if(aPos !== null && bPos !== null){
+                            prev.setAttribute('data-position', aPos);
+                            el.setAttribute('data-position', bPos);
+                        }
+                    }
+                });
+
+                down && down.addEventListener('click', async ()=>{
+                    const id = el.getAttribute('data-id');
+                    const next = el.nextElementSibling;
+                    if(!next) return; // already at bottom
+                    const res = await fetch('/Todo/MoveDown?id='+encodeURIComponent(id), {method:'POST'});
+                    if(res.ok){
+                        // swap DOM positions and swap data-position attributes
+                        const aPos = el.getAttribute('data-position');
+                        const bPos = next.getAttribute('data-position');
+                        swapElements(el, next);
+                        if(aPos !== null && bPos !== null){
+                            el.setAttribute('data-position', bPos);
+                            next.setAttribute('data-position', aPos);
+                        }
+                    }
+                });
+
+                chk && chk.addEventListener('change', async (e)=>{
+                    const id = el.getAttribute('data-id');
+                    const isComplete = e.target.checked;
+                    const title = titleEl ? titleEl.textContent.trim() : '';
+                    const position = parseInt(el.getAttribute('data-position') || '0');
+                    // send full dto to Update endpoint
+                    const updated = await postJson('/Todo/Update', { id: parseInt(id), title: title, isComplete: isComplete, position: position });
+                    if(updated !== null){
+                        titleEl.classList.toggle('completed', isComplete);
+                    }
+                });
+            }
+
+            // bind existing
+            Array.from(listEl.children).forEach(bindItem);
+
+        })();
+    </script>
+                                }
