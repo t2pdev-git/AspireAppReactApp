@@ -39,14 +39,13 @@ builder.AddNpmApp(name: "todo-frontend-angular", workingDirectory: "../todo-angu
 //.PublishAsDockerFile()
     .WithNpmPackageInstallation();
 
-builder.AddNpmApp(name: "vue", workingDirectory: "../vue-frontend")
-.WithReference(apiService)
-.WaitFor(apiService)
-.WithHttpEndpoint(env: "PORT")
-.WithExternalHttpEndpoints()
+builder.AddJavaScriptApp(name: "vue", "../vue-frontend")
+    .WithReference(apiService)
+    .WaitFor(apiService)
+    .WithHttpEndpoint(env: "PORT")
+    .WithExternalHttpEndpoints();
     // optional
-    //.PublishAsDockerFile()
-.WithNpmPackageInstallation();
+    //.PublishAsDockerFile();
 
 builder.AddProject<Projects.AspireAppReactApp_Web>("webfrontend")
     .WithExternalHttpEndpoints()
