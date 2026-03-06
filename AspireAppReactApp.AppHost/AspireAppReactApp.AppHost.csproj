@@ -13,7 +13,6 @@
   <ItemGroup>
     <ProjectReference Include="..\AspireAppReactApp.ApiService\AspireAppReactApp.ApiService.csproj" />
     <ProjectReference Include="..\AspireAppReactApp.Web\AspireAppReactApp.Web.csproj" />
-    <ProjectReference Include="..\FunctionApp\FunctionApp.csproj" />
     <ProjectReference Include="..\MvcWebApp\MvcWebApp.csproj" />
   </ItemGroup>
 

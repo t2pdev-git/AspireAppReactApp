@@ -17,21 +17,10 @@ var storage = builder.AddAzureStorage("storage").RunAsEmulator()
 var blobs = storage.AddBlobs("blobs");
 var queues = storage.AddQueues("queues");
 
-
-var functions = builder.AddAzureFunctionsProject<Projects.FunctionApp>("functionapp")
-     .WithReference(queues)
-    .WithReference(blobs)
-    .WaitFor(storage)
-        .WithRoleAssignments(storage,
-        // Storage Account Contributor and Storage Blob Data Owner roles are required by the Azure Functions host
-        StorageBuiltInRole.StorageAccountContributor, StorageBuiltInRole.StorageBlobDataOwner,
-        // Queue Data Contributor role is required to send messages to the queue
-        StorageBuiltInRole.StorageQueueDataContributor)
-        .WithHostStorage(storage);
-
 var db = builder.AddSqlite("db").WithSqliteWeb();
 
-var apiService = builder.AddProject<Projects.AspireAppReactApp_ApiService>("apiservice")
+var apiService = builder
+    .AddProject<Projects.AspireAppReactApp_ApiService>("apiservice")
     .WithReference(db)
     .WaitFor(db)
     .WithHttpHealthCheck("/health");
@@ -65,16 +54,11 @@ builder.AddProject<Projects.AspireAppReactApp_Web>("webfrontend")
     .WithReference(apiService)
     .WithReference(queues)
     .WithReference(blobs)
-    .WaitFor(functions)
     .WaitFor(apiService)
     .WithHttpHealthCheck("/health");
-
-
 
 builder.AddProject<Projects.MvcWebApp>("mvcwebapp")
     .WithReference(apiService)
     .WaitFor(apiService);
-
-
 
 builder.Build().Run();
