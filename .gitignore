@@ -3,3 +3,7 @@
 ################################################################################
 
 /AspireAppReactApp.sln
+
+# Build Outputs (Compiled binaries and temporary build files)
+[Bb]in/
+[Oo]bj/
